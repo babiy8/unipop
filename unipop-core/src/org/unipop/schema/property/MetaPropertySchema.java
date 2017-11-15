@@ -20,6 +20,16 @@ public class MetaPropertySchema implements ParentSchemaProperty {
     }
 
     @Override
+    public Set<String> excludeDynamicFields() {
+        return getChildren().stream().flatMap(schema -> schema.excludeDynamicFields().stream()).collect(Collectors.toSet());
+    }
+
+    @Override
+    public Set<String> excludeDynamicProperties() {
+        return getChildren().stream().flatMap(schema -> schema.excludeDynamicProperties().stream()).collect(Collectors.toSet());
+    }
+
+    @Override
     public Collection<PropertySchema> getChildren() {
         return Stream.of(propertySchemas, Collections.singletonList(mainSchema))
                 .flatMap(Collection::stream).collect(Collectors.toList());

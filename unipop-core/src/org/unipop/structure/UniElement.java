@@ -3,7 +3,6 @@ package org.unipop.structure;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.tinkerpop.gremlin.structure.*;
 import org.apache.tinkerpop.gremlin.structure.util.ElementHelper;
-import org.apache.tinkerpop.gremlin.structure.util.StringFactory;
 import org.unipop.query.mutation.PropertyQuery;
 import org.unipop.query.mutation.RemoveQuery;
 
@@ -114,7 +113,13 @@ public abstract class UniElement implements Element {
         Map<String, Object> properties = new HashMap<>();
         properties.put(T.id.getAccessor(), element.id());
         properties.put(T.label.getAccessor(), element.label());
-        element.properties().forEachRemaining(property -> properties.put(property.key(), property.value()));
+        element.properties().forEachRemaining(property -> {
+            if (property instanceof UniVertexMetaProperty) {
+                ((VertexProperty) property).properties()
+                        .forEachRemaining(prop -> properties.put(((Property) prop).key(), ((Property) prop).value()));
+            }
+            properties.put(property.key(), property.value());
+        });
 
         return properties;
     }

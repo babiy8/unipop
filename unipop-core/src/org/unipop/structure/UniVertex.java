@@ -27,11 +27,17 @@ public class UniVertex extends UniElement implements Vertex {
         keyValues.forEach((key, value) -> {
             List<VertexProperty> props;
             if (value instanceof Collection){
-                props = ((Collection<Object>) value).stream().map(v -> new UniVertexProperty<>(this, key, v)).collect(Collectors.toList());
+                props = ((Collection<Object>) value).stream().map(v -> {
+                    if (v instanceof Map && ((Map) v).containsKey("properties"))
+                        return new UniVertexMetaProperty<>(this, key, v);
+                    return new UniVertexProperty<>(this, key, v);
+                }).collect(Collectors.toList());
             }
             else{
                 props = new ArrayList<>();
-                props.add(new UniVertexProperty<>(this, key, value));
+                if (value instanceof Map && ((Map) value).containsKey("properties"))
+                    props.add(new UniVertexMetaProperty(this, key, value));
+                else props.add(new UniVertexProperty<>(this, key, value));
             }
             properties.put(key, props);
         });

@@ -1,26 +1,23 @@
 package org.unipop.structure;
 
 import org.apache.tinkerpop.gremlin.structure.*;
-import org.apache.tinkerpop.gremlin.structure.util.*;
+import org.apache.tinkerpop.gremlin.structure.util.ElementHelper;
+import org.apache.tinkerpop.gremlin.structure.util.StringFactory;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public class UniVertexProperty<V> implements VertexProperty<V> {
+public class UniVertexProperty<V> extends UniElement implements VertexProperty<V> {
 
-    private final UniVertex vertex;
-    private final String key;
-    private V value;
-    private Map<String, Object> properties;
+    protected final UniVertex vertex;
+    protected final String key;
+    protected V value;
 
     public UniVertexProperty(final UniVertex vertex, final String key, final V value) {
+        super(new HashMap<String, Object>(){{put(T.label.getAccessor(), value);}},vertex.graph);
         this.vertex = vertex;
         this.key = key;
-        if (value instanceof Map &&
-                ((Map) value).containsKey("properties")) {
-            this.properties = (Map<String, Object>) ((Map) value).get("properties");
-            this.value = (V) (((Map) value).get("value"));
-        }
         this.value = value;
     }
 
@@ -45,6 +42,16 @@ public class UniVertexProperty<V> implements VertexProperty<V> {
     }
 
     @Override
+    protected Map<String, Property> getPropertiesMap() {
+        throw VertexProperty.Exceptions.multiPropertiesNotSupported();
+    }
+
+    @Override
+    protected String getDefaultLabel() {
+        return label();
+    }
+
+    @Override
     public Object id() {
         return (long) (this.key.hashCode() + this.value.hashCode() + this.vertex.id().hashCode());
     }
@@ -52,6 +59,11 @@ public class UniVertexProperty<V> implements VertexProperty<V> {
     @Override
     public boolean equals(final Object object) {
         return ElementHelper.areEqual(this, object);
+    }
+
+    @Override
+    protected Property createProperty(String key, Object value) {
+        throw VertexProperty.Exceptions.multiPropertiesNotSupported();
     }
 
     @Override
