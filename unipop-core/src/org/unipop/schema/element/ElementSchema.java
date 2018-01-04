@@ -2,10 +2,15 @@ package org.unipop.schema.element;
 
 import org.apache.tinkerpop.gremlin.structure.Element;
 import org.unipop.query.predicates.PredicatesHolder;
-import org.unipop.structure.UniGraph;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
 
+/**
+ * 
+ */
 public interface ElementSchema<E extends Element> {
     Collection<E> fromFields(Map<String, Object> fields);
     Map<String, Object> toFields(E element);
