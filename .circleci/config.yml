@@ -3,14 +3,22 @@
 # Check https://circleci.com/docs/2.0/language-java/ for more details
 #
 version: 2
+services:
+  # ...
+  elasticsearch:
+    # need to build elasticsearch, since CircleCI does not allow mounting host files/directories into the container
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.elasticsearch
+    environment:
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    mem_swappiness: 1
+    mem_limit: 1g
+    volumes:
+      - elasticsearch:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
 jobs:
-  bundle_dependencies:
-    post:
-      - wget https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.4.3/elasticsearch-2.4.3.tar.gz
-      - tar -xvf elasticsearch-2.4.3.tar.gz
-      - elasticsearch-2.4.3/bin/elasticsearch: {background: true}
-      # Make sure that Elasticsearch is up before running tests:
-      - sleep 10 && wget --waitretry=5 --retry-connrefused -v http://127.0.0.1:9200/
   build:
     docker:
       # specify the version you desire here
