@@ -4,6 +4,13 @@
 #
 version: 2
 jobs:
+  bundle_dependencies:
+    post:
+      - wget https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.4.3/elasticsearch-2.4.3.tar.gz
+      - tar -xvf elasticsearch-2.4.3.tar.gz
+      - elasticsearch-2.4.3/bin/elasticsearch: {background: true}
+      # Make sure that Elasticsearch is up before running tests:
+      - sleep 10 && wget --waitretry=5 --retry-connrefused -v http://127.0.0.1:9200/
   build:
     docker:
       # specify the version you desire here
@@ -19,14 +26,6 @@ jobs:
     environment:
       # Customize the JVM maximum heap limit
       MAVEN_OPTS: -Xmx3200m
-
-    dependencies:
-        post:
-          - wget https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.4.3/elasticsearch-2.4.3.tar.gz
-          - tar -xvf elasticsearch-2.4.3.tar.gz
-          - elasticsearch-2.4.3/bin/elasticsearch: {background: true}
-          # Make sure that Elasticsearch is up before running tests:
-          - sleep 10 && wget --waitretry=5 --retry-connrefused -v http://127.0.0.1:9200/
 
     steps:
       - checkout
